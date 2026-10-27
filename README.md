@@ -5,3 +5,10 @@
 - Propensity score matching
 - Uplift curve analysis
 - Customer targeting strategy evaluation
+
+Current Progress
+
+* Completed customer treatment effect analysis.
+* Implemented propensity score matching.
+* Developed uplift curve analysis.
+* Working on optimization and budget allocation.
