@@ -8,7 +8,7 @@ from fastapi import FastAPI, File, HTTPException, Query, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-from src.optimizer_stub import greedy_optimizer
+from src.optimizer import greedy_optimizer
 from src.pipeline import REQUIRED_COLUMNS, run_allocation
 
 logger = logging.getLogger("econocausal.api")
@@ -163,16 +163,23 @@ def get_strategy_comparison(
     n = len(df)
     n_afford = min(n, int(budget // discount_amount))
     opt = run_allocation(df, greedy_optimizer, budget, discount_amount)
+    blanket_spend = float(n * discount_amount)
+    blanket_net_gain = float(ite.sum() - blanket_spend)
+
+    random_spend = float(n_afford * discount_amount)
+    random_gross_gain = float(ite.mean() * n_afford) if n else 0.0
+    random_net_gain = random_gross_gain - random_spend
+
     return [
         {
             "strategy": "blanket",
-            "total_spend": float(n * discount_amount),
-            "total_gain": float(ite.sum()),
+            "total_spend": blanket_spend,
+            "total_gain": blanket_net_gain,
         },
         {
             "strategy": "random",
-            "total_spend": float(n_afford * discount_amount),
-            "total_gain": float(ite.mean() * n_afford),
+            "total_spend": random_spend,
+            "total_gain": random_net_gain,
         },
         {
             "strategy": "optimized",

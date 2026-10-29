@@ -22,7 +22,7 @@ def run_pipeline(data_path:str="data/data.csv",optimizer:Optional[Optimizer]=Non
                  save_ite_path:Optional[str]="data/ite_scores.csv")->pd.DataFrame:
     from src.double_ml import fit_forest_dml,fit_linear_dml,predict_ite,save_ite_scores
     if optimizer is None:
-        from src.optimizer_stub import greedy_optimizer as optimizer
+        from src.optimizer import greedy_optimizer as optimizer
     df=pd.read_csv(data_path)
     missing=[c for c in REQUIRED_COLUMNS if c not in df.columns]
     if missing:
