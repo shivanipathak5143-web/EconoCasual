@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-
 def run_dowhy_refuters(model, identified, estimate, sims: int = 20) -> pd.DataFrame:
     tests = [
         ("Placebo treatment", "placebo_treatment_refuter",

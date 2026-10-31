@@ -4,7 +4,6 @@ import pandas as pd
 
 logger=logging.getLogger('econocasual.pipeline')
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
-
 REQUIRED_COLUMNS=["customer_id","recency","history","is_referral","discount","revenue"]
 Optimizer=Callable[[pd.DataFrame,float,float],pd.DataFrame]
 
