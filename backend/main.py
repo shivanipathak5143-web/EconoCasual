@@ -9,6 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 from src.optimizer import greedy_optimizer
+from src.drift import check_drift
 from src.pipeline import REQUIRED_COLUMNS, run_allocation
 
 logger = logging.getLogger("econocausal.api")
@@ -205,3 +206,28 @@ async def upload(file: UploadFile = File(...)):
     df.to_csv(UPLOAD_PATH, index=False)
     logger.info("upload: saved %d rows to %s", len(df), UPLOAD_PATH)
     return {"rows": len(df), "columns": list(df.columns)}
+
+@app.post("/api/drift")
+async def detect_data_drift(
+    file: UploadFile = File(...),
+    alpha: float = Query(0.05, gt=0, lt=1),
+):
+    """Compare an uploaded dataset against reference retail data."""
+
+    reference_path = DATA_DIR / "retail_campaign.csv"
+
+    if not reference_path.exists():
+        raise HTTPException(404, "Reference dataset not found")
+
+    try:
+        reference_df = pd.read_csv(reference_path)
+        new_df = pd.read_csv(io.BytesIO(await file.read()))
+    except Exception as exc:
+        raise HTTPException(400, f"Could not read CSV: {exc}")
+
+    try:
+        report = check_drift(reference_df, new_df, alpha=alpha)
+    except (ValueError, TypeError) as exc:
+        raise HTTPException(400, str(exc))
+
+    return report
