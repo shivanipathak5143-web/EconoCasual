@@ -3,7 +3,6 @@ import pandas as pd
 
 T_COL, Y_COL = "discount", "revenue"
 
-
 def decile_check(df: pd.DataFrame, ite: np.ndarray, groups: int = 5) -> pd.DataFrame:
     d = df[[T_COL, Y_COL]].copy()
     d["ite"] = np.asarray(ite)
